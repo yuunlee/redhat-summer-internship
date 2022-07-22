@@ -61,7 +61,7 @@ Issue close within an hour will be considered as bot response -> exclude
         - <= 15 days -> weight: 1
         - <= 30 days -> weight: 0.66
         - <= 45 days -> weight: 0.33
-        - <= 60 days -> weight: 0.1
+        - > 60 days -> weight: 0.1
         - > 365 days -> weight: 0
 PR close within an hour will be considered as bot response -> exclude
 
