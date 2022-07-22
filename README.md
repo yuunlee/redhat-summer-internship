@@ -38,11 +38,11 @@ By clicking on the repo, a breakdown table would display the name of the committ
 
 - Contributor
     - #committers
-    - #of contributes
-    - #of unique contributors
+        - #of contributes
+        - #of unique contributors
     - #authors
-    - #of authors
-    - #of unique authors
+        - #of authors
+        - #of unique authors
     - Organizational diversity (company sponsored project)
 
 
