@@ -69,6 +69,7 @@ Issue close within an hour will be considered as bot response -> exclude
 PR close within an hour will be considered as bot response -> exclude
 
 - PR/ issue close exponential decay
+The more recent an issue or a PR is being closed, the stronger indication it is to the performance. Thus a higher weight it has to the metric.
     - Close within 1 mo -> weight: 1
     - Close within 2 mo -> weight: 0.9
     - Close within 3 mo -> weight: 0.9*0.9
