@@ -78,3 +78,5 @@ Normalization on time series data
 
 ### Visualization
 [Dash](https://dash.plotly.com/) is an open source python framework create by plotly for creating interactive and customized web applications.
+
+### How to Run Locally
