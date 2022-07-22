@@ -33,6 +33,9 @@ Took monthly average activities and compared it with last month, to determine th
 
 
 ### Communities
+The community metric is the number of unique committers by month. With the metrics, a community manager would know which repo in an organization is growing/ declining in committer volume.
+By clicking on the repo, a breakdown table would display the name of the committer and its affiliation followed by its location. With the number of commits by month from each committer, the community manager would be able to know who the community is losing, or how many new contributors are coming to the community, thus making impactful decisions on building a stronger community.
+
 - Contributor
     - #committers
     - #of contributes
