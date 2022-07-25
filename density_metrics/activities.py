@@ -2,8 +2,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
 import dash
-from dash import html
-from dash import dcc
+import dash_html_components as html
+import dash_core_components as dcc
 from dash.dependencies import Output, Input, State
 from app import app
 from df.df_activities import dframe_perc, breakdown_frame
@@ -97,7 +97,7 @@ def update_graph(select_org):
 def update_side_graph(hov_data, clk_data, slct_data, select_org):
     if clk_data is None:
         dff1 = breakdown_frame[breakdown_frame['rg_name'] == 'kubernetes']
-        dff2 = dff1[dff1['repo_name'] == 'kubernetes']
+        dff2 = dff1[dff1['repo_name'] == 'kubernetes'].groupby(['rg_name', 'repo_name','yearmonth']).sum().reset_index()
         fig2 = go.Figure(
             data = [
                 go.Bar(
@@ -108,28 +108,46 @@ def update_side_graph(hov_data, clk_data, slct_data, select_org):
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
+                    y=dff2['pull_request_increment'],
+                    name='Increase in PR',
+                    marker_color='lime'
+                ),
+                go.Bar(
+                    x=dff2['yearmonth'],
                     y=dff2['open_pull_request_increment'],
                     name='Increase in open PR',
-                    marker_color='lightsalmon'
+                    marker_color='aqua'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['closed_pull_request_increment'],
                     name='Increase in closed PR',
-                    marker_color='RoyalBlue'
+                    marker_color='cornflowerblue'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['merged_pull_request_increment'],
                     name='Increase in merged PR',
-                    marker_color='MediumPurple'
+                    marker_color='RoyalBlue'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['issue_increment'],
                     name='Increase in issue',
-                    marker_color='LightSeaGreen'
-                )
+                    marker_color='lightsalmon'
+                ),
+                go.Bar(
+                    x=dff2['yearmonth'],
+                    y=dff2['star_increment'],
+                    name='Increase in star',
+                    marker_color='aliceblue'
+                ),
+                go.Bar(
+                    x=dff2['yearmonth'],
+                    y=dff2['fork_increment'],
+                    name='Increase in fork',
+                    marker_color='cornsilk'
+                ),
             ]
         )
 
@@ -150,33 +168,33 @@ def update_side_graph(hov_data, clk_data, slct_data, select_org):
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
+                    y=dff2['pull_request_increment'],
+                    name='Increase in PR',
+                    marker_color='lime'
+                ),
+                go.Bar(
+                    x=dff2['yearmonth'],
                     y=dff2['open_pull_request_increment'],
                     name='Increase in open PR',
-                    marker_color='lightsalmon'
+                    marker_color='aqua'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['closed_pull_request_increment'],
                     name='Increase in closed PR',
-                    marker_color='RoyalBlue'
+                    marker_color='cornflowerblue'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['merged_pull_request_increment'],
                     name='Increase in merged PR',
-                    marker_color='MediumPurple'
+                    marker_color='RoyalBlue'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
                     y=dff2['issue_increment'],
                     name='Increase in issue',
-                    marker_color='LightSeaGreen'
-                ),
-                go.Bar(
-                    x=dff2['yearmonth'],
-                    y=dff2['pull_request_increment'],
-                    name='Increase in pr',
-                    marker_color='lime'
+                    marker_color='lightsalmon'
                 ),
                 go.Bar(
                     x=dff2['yearmonth'],
@@ -188,7 +206,7 @@ def update_side_graph(hov_data, clk_data, slct_data, select_org):
                     x=dff2['yearmonth'],
                     y=dff2['fork_increment'],
                     name='Increase in fork',
-                    marker_color='cadetblue'
+                    marker_color='cornsilk'
                 ),
             ]
         )
