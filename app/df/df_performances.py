@@ -4,7 +4,8 @@ import sqlalchemy as salc
 import psycopg2
 from df.df_activities import engine
 
-pr_query = salc.sql.text(f"""
+pr_query = salc.sql.text(
+    f"""
 /*
 1. whether the PR is closed or open -> status
 2. time required to close an PR -> duration
@@ -34,7 +35,7 @@ SELECT x.repo_group_id,
 					pull_requests.pr_created_at,
 					pull_requests.pr_closed_at,
 				    (pr_closed_at - pr_created_at) AS pull_request_duration,
-				   CASE 
+				   CASE
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '15 days' THEN 1
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '30 days' THEN 0.66
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '60 days' THEN 0.33
@@ -43,7 +44,7 @@ SELECT x.repo_group_id,
 				   	ELSE 0
 				   END
 				   AS close_duration,
-				   CASE 
+				   CASE
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '15 days' THEN 'Fast'
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '30 days' THEN 'Mild'
 				   	WHEN pull_requests.pr_closed_at - pull_requests.pr_created_at <= INTERVAL '60 days' THEN 'Slow'
@@ -53,7 +54,7 @@ SELECT x.repo_group_id,
 				   END
 				   AS segment,
 				   NOW() - pull_requests.pr_closed_at AS "time_passed",
-				   CASE 
+				   CASE
 				   	WHEN NOW() - pull_requests.pr_closed_at < INTERVAL '30 days' THEN 1
 				   	WHEN NOW() - pull_requests.pr_closed_at < INTERVAL '60 days' THEN 0.9
 				   	WHEN NOW() - pull_requests.pr_closed_at < INTERVAL '90 days' THEN 0.9*0.9
@@ -73,32 +74,36 @@ SELECT x.repo_group_id,
             LEFT JOIN repo r
                 ON r.repo_id = pull_requests.repo_id
 			WHERE pull_requests.pr_closed_at - pull_requests.pr_created_at > INTERVAL '1 hours'
-			ORDER BY repo_id 
+			ORDER BY repo_id
 		) AS x
-		left join repo_groups rg 
+		left join repo_groups rg
 			on rg.repo_group_id = x.repo_group_id
 	GROUP BY x.repo_id, x.repo_name, x.repo_group_id, rg.rg_name, x.yearmonth, x.segment, x.pr_created_at, x.pr_closed_at, x.pull_request_duration, close_duration, exp_decay
 	order by x.repo_id
 
-""")
+"""
+)
 
-def Bar_Color(i):  
-    if i == 'Fast':
+
+def Bar_Color(i):
+    if i == "Fast":
         return "lightgreen"
-    elif i == 'Mild':
+    elif i == "Mild":
         return "blueviolet"
-    elif i == 'Slow':
+    elif i == "Slow":
         return "yellow"
-    elif i == 'Stale':
+    elif i == "Stale":
         return "orange"
-    elif i == 'Expired':
+    elif i == "Expired":
         return "grey"
 
+
 dframe_pr = pd.read_sql(pr_query, con=engine)
-dframe_pr['color'] = list(map(Bar_Color, dframe_pr['segment']))
+dframe_pr["color"] = list(map(Bar_Color, dframe_pr["segment"]))
 
 
-issue_query = salc.sql.text(f"""
+issue_query = salc.sql.text(
+    f"""
 SELECT x.repo_group_id,
 		rg.rg_name,
 		x.repo_id,
@@ -117,7 +122,7 @@ SELECT x.repo_group_id,
 				   i.issue_state,
 				   CAST(EXTRACT(YEAR FROM i.created_at) AS text) || '-' || CAST(EXTRACT(MONTH FROM i.created_at) AS text) AS yearmonth,
 				   (i.closed_at - i.created_at) AS issue_close_duration,
-				   CASE 
+				   CASE
 					   	WHEN i.closed_at - i.created_at <= interval '30 days' THEN 1
 					   	WHEN i.closed_at - i.created_at <= interval '60 days' THEN 0.66
 					   	WHEN i.closed_at - i.created_at <= interval '90 days' THEN 0.33
@@ -127,7 +132,7 @@ SELECT x.repo_group_id,
 					   	ELSE 0
 				   END
 				   AS close_duration,
-				   CASE 
+				   CASE
 				   	WHEN i.closed_at - i.created_at <= INTERVAL '30 days' THEN 'Fast'
 				   	WHEN i.closed_at - i.created_at <= INTERVAL '60 days' THEN 'Mild'
 				   	WHEN i.closed_at - i.created_at <= INTERVAL '90 days' THEN 'Slow'
@@ -139,7 +144,7 @@ SELECT x.repo_group_id,
 				   i.created_at,
 				   i.closed_at,
 				   NOW() - i.closed_at AS "time_passed_after_closing",
-				   CASE 
+				   CASE
 				   	WHEN NOW() - i.closed_at < interval '30 days' THEN 1
 				   	WHEN NOW() - i.closed_at < interval '60 days' THEN 0.9
 				   	WHEN NOW() - i.closed_at < interval '90 days' THEN 0.9*0.9
@@ -162,11 +167,12 @@ SELECT x.repo_group_id,
 			WHERE i.closed_at - i.created_at > INTERVAL '1 hours'
 			ORDER BY i.repo_id
 			) AS x
-		LEFT JOIN repo_groups rg 
+		LEFT JOIN repo_groups rg
 			ON rg.repo_group_id = x.repo_group_id
 	GROUP BY x.repo_id, x.repo_name, x.repo_group_id, rg.rg_name, x.yearmonth, x.segment, close_duration, exp_decay
 	order by x.repo_id
-""")
+"""
+)
 
 dframe_issue = pd.read_sql(issue_query, con=engine)
-dframe_issue['color'] = list(map(Bar_Color, dframe_issue['segment']))
+dframe_issue["color"] = list(map(Bar_Color, dframe_issue["segment"]))
