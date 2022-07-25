@@ -1,2 +1,5 @@
 # exclude virtual env folder
 myvenv/
+
+# ignore credentials
+config.json
